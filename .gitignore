@@ -7,3 +7,4 @@ coverage/
 !.env.example
 apps/api/prisma/generated/
 .specs
+.impeccable
