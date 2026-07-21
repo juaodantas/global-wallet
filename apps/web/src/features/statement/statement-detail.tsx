@@ -85,8 +85,8 @@ export function StatementDetail({ operationId }: StatementDetailProps) {
     <div className="wallet-dashboard">
       <PageHeader
         eyebrow="Extrato"
-        title={typeLabels[detail.type] ?? ''}
-        description={`Operação ${detail.operationId}`}
+        title={typeLabels[detail.type] ?? 'Operação'}
+        description="Detalhes completos da operação financeira."
       />
 
       <Card>
@@ -129,7 +129,7 @@ export function StatementDetail({ operationId }: StatementDetailProps) {
             <div className="statement-detail__row">
               <span className="statement-detail__label">Operação original</span>
               <Link href={`/statement/${detail.originalOperationId}`} className="statement-detail__link">
-                {detail.originalOperationId}
+                Ver operação original
               </Link>
             </div>
           ) : null}
@@ -137,7 +137,7 @@ export function StatementDetail({ operationId }: StatementDetailProps) {
             <div className="statement-detail__row">
               <span className="statement-detail__label">Estorno</span>
               <Link href={`/statement/${detail.reversalOperationId}`} className="statement-detail__link">
-                {detail.reversalOperationId}
+                Ver operação de estorno
               </Link>
             </div>
           ) : null}

@@ -103,9 +103,261 @@ a:focus-visible, button:focus-visible, input:focus-visible { outline: none; box-
 .wallet-reference-total, .wallet-recent-activity, .wallet-actions { display: grid; gap: var(--space-3); }
 .wallet-placeholder__header { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); color: var(--color-muted); font-weight: 750; }
 .wallet-reference-total p, .wallet-recent-activity p { margin: 0; color: var(--color-muted); line-height: 1.6; }
+.wallet-recent-activity__list { display: grid; gap: var(--space-2); }
+.wallet-recent-activity__item { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); padding: var(--space-3); border: 1px solid var(--color-border); border-radius: var(--radius-md); text-decoration: none; color: inherit; transition: background var(--motion-fast); }
+.wallet-recent-activity__item:hover { background: var(--color-surface-muted); }
+.wallet-recent-activity__item-header { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); }
+.wallet-recent-activity__type { font-size: 0.85rem; color: var(--color-muted); font-weight: 750; }
+.wallet-recent-activity__item-amount { font-size: 1rem; font-weight: 850; letter-spacing: -0.03em; }
+.wallet-recent-activity__link { display: block; margin-top: var(--space-3); color: var(--color-brand); font-weight: 700; font-size: 0.92rem; }
 .wallet-actions__list { display: flex; flex-wrap: wrap; gap: var(--space-2); }
 .wallet-actions__item { min-height: 38px; padding: 8px 12px; border: 1px dashed var(--color-border); border-radius: var(--radius-pill); color: var(--color-muted); background: var(--color-surface-muted); font-weight: 800; cursor: not-allowed; }
-.wallet-recent-activity__empty { padding: var(--space-4); border: 1px dashed var(--color-border); border-radius: var(--radius-md); color: var(--color-muted); background: var(--color-surface-muted); }
+.wallet-actions__item--active { cursor: pointer; border-style: solid; color: var(--color-brand); background: var(--color-surface); }
+.wallet-actions__item--active:hover { background: #eaf0ff; border-color: #cdd9ff; }
+
+/* --- Select styling --- */
+.field select,
+select.field-input {
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: white;
+  color: var(--color-text);
+  font: inherit;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23526179' d='M2 4.5L6 8.5L10 4.5' stroke='%23526179' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 36px;
+  cursor: pointer;
+}
+.field select:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+/* --- Card heading consistency --- */
+.card h2 {
+  margin: 0 0 var(--space-3);
+  font-size: 1.25rem;
+  font-weight: 750;
+  letter-spacing: -0.02em;
+}
+
+/* --- Form actions (button spacing after fields) --- */
+.form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+}
+.form-actions--right { justify-content: flex-end; }
+.form-actions--between { justify-content: space-between; }
+
+.card > .field + .field,
+.card > .field + .form-actions,
+.card > .field + label.field {
+  margin-top: var(--space-4);
+}
+.card > label.field + label.field {
+  margin-top: var(--space-4);
+}
+.card > label.field + .field {
+  margin-top: var(--space-4);
+}
+.card > .field + .button {
+  margin-top: var(--space-5);
+}
+
+/* --- Statement filters --- */
+.statement-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  align-items: flex-end;
+}
+.statement-filters .field {
+  flex: 1 0 140px;
+  min-width: 0;
+}
+.statement-filters .button {
+  flex-shrink: 0;
+  align-self: flex-end;
+}
+
+/* --- Statement list items --- */
+.statement-list {
+  display: grid;
+  gap: var(--space-3);
+}
+.statement-list__link {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  transition: transform var(--motion-fast), box-shadow var(--motion-fast);
+}
+.statement-list__link:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-card);
+}
+.statement-list__item {
+  display: grid;
+  gap: var(--space-3);
+}
+.statement-list__item-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+.statement-list__type {
+  font-weight: 750;
+  font-size: 0.85rem;
+  color: var(--color-muted);
+}
+.statement-list__item-body {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-3);
+}
+.statement-list__amount {
+  font-size: 1.25rem;
+  font-weight: 850;
+  letter-spacing: -0.03em;
+}
+.statement-list__conversion {
+  font-size: 0.85rem;
+  color: var(--color-muted);
+}
+.statement-list__item-footer {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: 0.85rem;
+}
+.statement-list__date {
+  color: var(--color-muted);
+}
+.statement-list__load-more {
+  display: flex;
+  justify-content: center;
+  margin-top: var(--space-4);
+}
+
+/* --- Statement detail --- */
+.statement-detail__info {
+  display: grid;
+  gap: var(--space-4);
+}
+.statement-detail__row {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  gap: var(--space-3);
+  align-items: center;
+}
+.statement-detail__label {
+  font-weight: 750;
+  color: var(--color-muted);
+  font-size: 0.85rem;
+}
+.statement-detail__section-title {
+  font-size: 1.25rem;
+  font-weight: 750;
+  letter-spacing: -0.02em;
+  margin: 0 0 var(--space-4);
+}
+.statement-detail__entries {
+  display: grid;
+  gap: 1px;
+  background: var(--color-border);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+.statement-detail__entries-header,
+.statement-detail__entries-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr 1fr 1.5fr;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  background: var(--color-surface);
+  font-size: 0.85rem;
+}
+.statement-detail__entries-header {
+  font-weight: 750;
+  color: var(--color-muted);
+  background: var(--color-surface-muted);
+  letter-spacing: 0.03em;
+}
+.statement-detail__entries-row + .statement-detail__entries-row {
+  border-top: 1px solid var(--color-border);
+}
+.statement-detail__mono {
+  font-family: "SF Mono", "Consolas", "Liberation Mono", monospace;
+  font-size: 0.8rem;
+  color: var(--color-muted);
+}
+.statement-detail__link {
+  color: var(--color-brand);
+  font-weight: 700;
+}
+
+/* --- History list (deposits, transfers) --- */
+.history-list {
+  display: grid;
+  gap: var(--space-2);
+}
+.history-list__item {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+.history-list__item-main {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-2);
+}
+.history-list__amount {
+  font-weight: 800;
+}
+.history-list__meta {
+  font-size: 0.85rem;
+  color: var(--color-muted);
+}
+.history-list__actions {
+  display: flex;
+  gap: var(--space-2);
+}
+
+/* --- Emphasis card for balance display --- */
+.balance-card--emphasis {
+  background: linear-gradient(135deg, #ffffff 0%, #f4fbfd 100%);
+  border-color: #b7dce8;
+}
+
+/* --- Previas / Recibos (exchange) --- */
+.quote-preview {
+  display: grid;
+  gap: var(--space-3);
+}
+.quote-preview__rate {
+  font-size: 0.9rem;
+  color: var(--color-muted);
+}
+.quote-preview__conversion {
+  font-size: 1.1rem;
+  font-weight: 800;
+}
 
 @media (max-width: 760px) {
   .auth-shell__grid { grid-template-columns: 1fr; }
@@ -113,6 +365,13 @@ a:focus-visible, button:focus-visible, input:focus-visible { outline: none; box-
   .app-shell__header, .page-header { align-items: flex-start; flex-direction: column; }
   .wallet-dashboard__planned { grid-template-columns: 1fr; }
   .state-view__actions { grid-auto-flow: row; width: 100%; }
+  .statement-detail__row { grid-template-columns: 1fr; gap: var(--space-1); }
+  .statement-detail__entries { overflow-x: auto; }
+  .statement-detail__entries-header,
+  .statement-detail__entries-row { min-width: 640px; }
+  .statement-filters { flex-direction: column; }
+  .statement-filters .field { flex: 1 1 100%; }
+  .statement-list__item-body { flex-direction: column; gap: var(--space-2); }
 }
 
 @media (prefers-reduced-motion: reduce) {

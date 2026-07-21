@@ -59,19 +59,18 @@ function WalletContent({ wallet }: { wallet: WalletDto }) {
       <PageHeader
         eyebrow="Painel"
         title="Sua carteira está pronta"
-        description="Os saldos são separados por moeda e carregados pela API da carteira. Fluxos de movimentação estão planejados, mas ainda não estão ativos."
+        description="Saldos por moeda carregados da sua carteira. Acesse cada fluxo de movimentação pelas ações abaixo."
       />
       <Card className="wallet-summary">
         <Badge variant={hasPositiveBalance ? 'status' : 'planned'}>{hasPositiveBalance ? 'Carteira disponível' : 'Saldo zerado'}</Badge>
         <h2>Resumo da carteira</h2>
         <div className="wallet-summary__meta">
-          <span>ID da carteira: {wallet.walletId}</span>
           <span>Criada em: {new Date(wallet.createdAt).toLocaleDateString('pt-BR')}</span>
           <span>Compatíveis: {wallet.supportedCurrencies.join(', ')}</span>
         </div>
       </Card>
       {!hasPositiveBalance ? (
-        <StateView variant="empty" title="Ainda não há saldo" description="Este é um estado válido para uma carteira nova. Ações de depósito, câmbio e transferência aparecerão apenas depois que esses fluxos forem implementados." />
+        <StateView variant="empty" title="Ainda não há saldo" description="Sua carteira está vazia. Faça um depósito para começar a movimentar." />
       ) : null}
       <section className="wallet-dashboard__planned" aria-label="Áreas planejadas da carteira">
         <WalletReferenceTotalPlaceholder />

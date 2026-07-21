@@ -59,7 +59,11 @@ export function AuthForm({ mode, submitLabel }: AuthFormProps) {
         required
       />
       {error ? <p className="error" role="alert">{error}</p> : null}
-      <Button type="submit" disabled={loading} loading={loading} fullWidth>{loading ? 'Aguarde…' : submitLabel}</Button>
+      <div className="form-actions">
+        <Button type="submit" disabled={loading} loading={loading} fullWidth>
+          {loading ? 'Aguarde…' : submitLabel}
+        </Button>
+      </div>
     </form>
   );
 }

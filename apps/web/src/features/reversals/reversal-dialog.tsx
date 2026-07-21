@@ -62,7 +62,7 @@ export function ReversalDialog({ operationId, operationType, onSuccess, onError 
         placeholder="Descreva o motivo do estorno"
       />
       {error ? <p className="field__error">{error}</p> : null}
-      <div style={{ display: 'flex', gap: '0.5rem' }}>
+      <div className="form-actions">
         <Button loading={loading} onClick={handleConfirm}>
           {loading ? 'Estornando…' : 'Confirmar estorno'}
         </Button>
