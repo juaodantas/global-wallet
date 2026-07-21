@@ -1,6 +1,5 @@
 import Link from 'next/link';
 import type { ReactNode } from 'react';
-import { Badge } from '../ui/badge';
 
 type AppShellProps = { children: ReactNode; sessionActions?: ReactNode };
 
@@ -11,8 +10,10 @@ export function AppShell({ children, sessionActions }: AppShellProps) {
         <Link className="app-shell__brand" href="/">Global Wallet</Link>
         <nav className="app-shell__nav" aria-label="Navegação principal">
           <Link href="/">Painel</Link>
-          <span>Transferências <Badge variant="planned">Planejado</Badge></span>
-          <span>Câmbio <Badge variant="planned">Planejado</Badge></span>
+          <Link href="/deposits">Depósitos</Link>
+          <Link href="/transfers">Transferências</Link>
+          <Link href="/exchange">Câmbio</Link>
+          <Link href="/statement">Extrato</Link>
         </nav>
         {sessionActions}
       </header>

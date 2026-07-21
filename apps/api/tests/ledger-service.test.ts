@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { AppError } from '../src/shared/errors/app-error.js';
 import { toFinancialOperationId, toUserId, toWalletId } from '../src/shared/domain/ids.js';
-import type { LedgerRepository, LedgerRepositoryPostingRequest } from '../src/modules/ledger/application/ledger-repository.js';
+import type { LedgerRepository, LedgerRepositoryAtomicPostingRequest, LedgerRepositoryPostingRequest, LedgerTransaction } from '../src/modules/ledger/application/ledger-repository.js';
 import { LedgerPostingService } from '../src/modules/ledger/application/ledger-posting-service.js';
 import type { LedgerOperationResult } from '../src/modules/ledger/domain/types.js';
 import { toPositiveMinorAmount } from '../src/modules/ledger/domain/types.js';
@@ -58,6 +58,10 @@ class FakeLedgerRepository implements LedgerRepository {
     };
     this.idempotency.set(idempotencyKey, { payloadHash: request.idempotency.payloadHash, result });
     return result;
+  }
+
+  async postInTransaction(_transaction: LedgerTransaction, request: LedgerRepositoryAtomicPostingRequest): Promise<LedgerOperationResult> {
+    return this.post({ ...request, idempotency: { endpoint: 'test:transaction', key: request.idempotencyRecordId ?? 'test-key', payloadHash: 'test-payload' } });
   }
 
   async reconcile() {

@@ -2,7 +2,7 @@ import { createHash } from 'node:crypto';
 import { Prisma, type PrismaClient } from '@prisma/client';
 import { AppError } from '../../../shared/errors/app-error.js';
 import { toFinancialOperationId } from '../../../shared/domain/ids.js';
-import type { LedgerReconciliationDifference, LedgerRepository, LedgerRepositoryPostingRequest } from '../application/ledger-repository.js';
+import type { LedgerReconciliationDifference, LedgerRepository, LedgerRepositoryAtomicPostingRequest, LedgerRepositoryPostingRequest } from '../application/ledger-repository.js';
 import { idempotencyConflictError, insufficientFundsError } from '../domain/errors.js';
 import type { AffectedBalanceSnapshot, LedgerOperationResult } from '../domain/types.js';
 import { ledgerOperationResultSchema } from '../domain/types.js';
@@ -45,46 +45,7 @@ export class PrismaLedgerRepository implements LedgerRepository {
         return ledgerOperationResultSchema.parse(existingRecord.storedResponse);
       }
 
-      const operation = await transaction.financialOperation.create({
-        data: {
-          actorUserId: request.actorUserId,
-          primaryWalletId: request.primaryWalletId,
-          type: request.type,
-          status: 'COMPLETED',
-          ...(request.correlationId ? { correlationId: request.correlationId } : {}),
-          ...(request.originalOperationId ? { originalOperationId: request.originalOperationId } : {})
-        }
-      });
-
-      const affectedBalances: AffectedBalanceSnapshot[] = [];
-      for (const entry of request.entries) {
-        const balance = await this.applyEntry(transaction, entry);
-        await transaction.ledgerEntry.create({
-          data: {
-            operationId: operation.id,
-            walletId: entry.walletId,
-            currency: entry.currency,
-            direction: entry.direction,
-            amountMinor: BigInt(entry.amountMinor),
-            balanceAfterMinor: balance.amountMinor
-          }
-        });
-        affectedBalances.push({ walletId: entry.walletId, currency: entry.currency, balanceAfterMinor: toSafeNumber(balance.amountMinor) });
-      }
-
-      if (request.type === 'REVERSAL' && request.originalOperationId) {
-        await transaction.financialOperation.update({
-          where: { id: request.originalOperationId },
-          data: { status: 'REVERSED', reversalOperationId: operation.id }
-        });
-      }
-
-      const result: LedgerOperationResult = {
-        operationId: toFinancialOperationId(operation.id),
-        status: operation.status,
-        createdAt: operation.createdAt.toISOString(),
-        affectedBalances
-      };
+      const result = await this.postInTransaction(transaction, request);
 
       const idempotencyRecord = await transaction.idempotencyRecord.create({
         data: {
@@ -98,12 +59,56 @@ export class PrismaLedgerRepository implements LedgerRepository {
       });
 
       await transaction.financialOperation.update({
-        where: { id: operation.id },
+        where: { id: result.operationId },
         data: { idempotencyRecordId: idempotencyRecord.id }
       });
 
       return result;
     });
+  }
+
+  async postInTransaction(transaction: Prisma.TransactionClient, request: LedgerRepositoryAtomicPostingRequest): Promise<LedgerOperationResult> {
+    const operation = await transaction.financialOperation.create({
+      data: {
+        actorUserId: request.actorUserId,
+        primaryWalletId: request.primaryWalletId,
+        type: request.type,
+        status: 'COMPLETED',
+        ...(request.idempotencyRecordId ? { idempotencyRecordId: request.idempotencyRecordId } : {}),
+        ...(request.correlationId ? { correlationId: request.correlationId } : {}),
+        ...(request.originalOperationId ? { originalOperationId: request.originalOperationId } : {})
+      }
+    });
+
+    const affectedBalances: AffectedBalanceSnapshot[] = [];
+    for (const entry of request.entries) {
+      const balance = await this.applyEntry(transaction, entry);
+      await transaction.ledgerEntry.create({
+        data: {
+          operationId: operation.id,
+          walletId: entry.walletId,
+          currency: entry.currency,
+          direction: entry.direction,
+          amountMinor: BigInt(entry.amountMinor),
+          balanceAfterMinor: balance.amountMinor
+        }
+      });
+      affectedBalances.push({ walletId: entry.walletId, currency: entry.currency, balanceAfterMinor: toSafeNumber(balance.amountMinor) });
+    }
+
+    if (request.type === 'REVERSAL' && request.originalOperationId) {
+      await transaction.financialOperation.update({
+        where: { id: request.originalOperationId },
+        data: { status: 'REVERSED', reversalOperationId: operation.id }
+      });
+    }
+
+    return {
+      operationId: toFinancialOperationId(operation.id),
+      status: operation.status,
+      createdAt: operation.createdAt.toISOString(),
+      affectedBalances
+    };
   }
 
   async reconcile(): Promise<LedgerReconciliationDifference[]> {

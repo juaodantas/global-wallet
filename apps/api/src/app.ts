@@ -15,6 +15,22 @@ import { GetWalletForUserQuery } from './modules/wallet/application/get-wallet-f
 import type { WalletReadRepository } from './modules/wallet/application/get-wallet-for-user.js';
 import { registerWalletRoutes } from './modules/wallet/http/wallet-routes.js';
 import { PrismaWalletRepository } from './modules/wallet/infrastructure/prisma-wallet-repository.js';
+import { LedgerPostingService } from './modules/ledger/application/ledger-posting-service.js';
+import { PrismaLedgerRepository } from './modules/ledger/infrastructure/prisma-ledger-repository.js';
+import { DepositService } from './modules/deposits/application/deposit-service.js';
+import { PrismaDepositRepository } from './modules/deposits/infrastructure/prisma-deposit-repository.js';
+import { registerDepositRoutes } from './modules/deposits/http/deposit-routes.js';
+import { TransferService } from './modules/transfers/application/transfer-service.js';
+import { PrismaTransferRepository } from './modules/transfers/infrastructure/prisma-transfer-repository.js';
+import { registerTransferRoutes } from './modules/transfers/http/transfer-routes.js';
+import { ExchangeService } from './modules/exchange/application/exchange-service.js';
+import { PrismaExchangeRepository } from './modules/exchange/infrastructure/prisma-exchange-repository.js';
+import { StaticExchangeRateProvider } from './modules/exchange/infrastructure/static-rate-provider.js';
+import { registerExchangeRoutes } from './modules/exchange/http/exchange-routes.js';
+import { StatementService } from './modules/statement/application/statement-service.js';
+import { registerStatementRoutes } from './modules/statement/http/statement-routes.js';
+import { ReversalService } from './modules/reversals/application/reversal-service.js';
+import { registerReversalRoutes } from './modules/reversals/http/reversal-routes.js';
 
 export type AppDependencies = {
   env?: AppEnv;
@@ -36,10 +52,21 @@ export async function buildApp(dependencies: AppDependencies = {}) {
   const walletReader = dependencies.walletRepository ?? walletRepository;
   const authService = new AuthService(authRepository, walletCreator);
   const walletQuery = new GetWalletForUserQuery(walletReader);
+  const ledgerPosting = new LedgerPostingService(new PrismaLedgerRepository(prisma));
+  const depositService = new DepositService(new PrismaDepositRepository(prisma), ledgerPosting);
+  const transferService = new TransferService(new PrismaTransferRepository(prisma), ledgerPosting);
+  const exchangeService = new ExchangeService(new PrismaExchangeRepository(prisma), ledgerPosting, new StaticExchangeRateProvider());
+  const statementService = new StatementService(prisma);
+  const reversalService = new ReversalService(prisma, ledgerPosting);
 
   app.get('/health', async () => ({ status: 'ok' }));
   await registerAuthRoutes(app, { authService, env });
   await registerWalletRoutes(app, { walletQuery, env });
+  await registerDepositRoutes(app, { depositService, env });
+  await registerTransferRoutes(app, { transferService, env });
+  await registerExchangeRoutes(app, { exchangeService, env });
+  await registerStatementRoutes(app, { statementService, env });
+  await registerReversalRoutes(app, { reversalService, env });
 
   return app;
 }
