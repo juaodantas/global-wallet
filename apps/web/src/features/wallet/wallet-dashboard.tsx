@@ -7,7 +7,10 @@ import { StateView } from '../../components/ui/state-view';
 import { Card } from '../../components/ui/card';
 import { Badge } from '../../components/ui/badge';
 import { getWallet, type WalletApiResult } from '../../lib/api/wallet-api';
+import { WalletActionsNav } from './wallet-actions-nav';
 import { WalletBalanceCard } from './wallet-balance-card';
+import { WalletRecentActivityPlaceholder } from './wallet-recent-activity-placeholder';
+import { WalletReferenceTotalPlaceholder } from './wallet-reference-total-placeholder';
 
 type WalletState = { status: 'loading' } | WalletApiResult;
 type WalletDashboardProps = { renderLayout?: (children: ReactNode, authenticated: boolean) => ReactNode };
@@ -70,9 +73,14 @@ function WalletContent({ wallet }: { wallet: WalletDto }) {
       {!hasPositiveBalance ? (
         <StateView variant="empty" title="Ainda não há saldo" description="Este é um estado válido para uma carteira nova. Ações de depósito, câmbio e transferência aparecerão apenas depois que esses fluxos forem implementados." />
       ) : null}
+      <section className="wallet-dashboard__planned" aria-label="Áreas planejadas da carteira">
+        <WalletReferenceTotalPlaceholder />
+        <WalletActionsNav />
+      </section>
       <section className="wallet-dashboard__grid" aria-label="Saldos por moeda">
         {wallet.balances.map((balance) => <WalletBalanceCard key={balance.currency} balance={balance} />)}
       </section>
+      <WalletRecentActivityPlaceholder />
     </div>
   );
 }
