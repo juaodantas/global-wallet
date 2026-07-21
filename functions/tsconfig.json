@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "module": "NodeNext",
+    "allowImportingTsExtensions": true,
+    "esModuleInterop": true,
+    "moduleResolution": "nodenext",
+    "paths": {
+      "@global-wallet/contracts": [
+        "../packages/contracts/src/index.ts"
+      ]
+    },
+    "noImplicitReturns": true,
+    "noUnusedLocals": false,
+    "noEmit": true,
+    "sourceMap": true,
+    "strict": true,
+    "target": "es2022"
+  },
+  "compileOnSave": true,
+  "include": [
+    "src",
+    "../apps/api/src",
+    "../packages/contracts/src"
+  ]
+}
