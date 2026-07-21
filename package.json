@@ -1,0 +1,32 @@
+{
+  "name": "global-wallet",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "npm run db:prepare && concurrently -n api,web -c blue,green \"npm run dev:api\" \"npm run dev:web\"",
+    "dev:api": "npm run dev -w @global-wallet/api",
+    "dev:local": "scripts/dev-local.sh",
+    "dev:web": "npm run dev -w @global-wallet/web",
+    "build": "npm run build --workspaces --if-present",
+    "typecheck": "npm run build -w @global-wallet/contracts && npm run typecheck --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "lint": "npm run typecheck",
+    "prisma:validate": "prisma validate --schema apps/api/prisma/schema.prisma",
+    "prisma:generate": "prisma generate --schema apps/api/prisma/schema.prisma",
+    "db:up": "docker compose up -d postgres",
+    "db:prepare": "npm run db:up && docker compose up -d --wait postgres && npx prisma migrate deploy --schema apps/api/prisma/schema.prisma && npx prisma generate --schema apps/api/prisma/schema.prisma",
+    "db:down": "docker compose down",
+    "db:reset": "docker compose down -v"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.1",
+    "concurrently": "^10.0.3",
+    "prisma": "^6.3.1",
+    "typescript": "^5.7.3",
+    "vitest": "^3.0.5"
+  }
+}
