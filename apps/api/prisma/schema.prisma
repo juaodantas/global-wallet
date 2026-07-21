@@ -14,25 +14,46 @@ enum Currency {
   GBP
 }
 
+enum FinancialOperationType {
+  DEPOSIT
+  TRANSFER
+  EXCHANGE_CONVERSION
+  REVERSAL
+}
+
+enum FinancialOperationStatus {
+  COMPLETED
+  REVERSED
+}
+
+enum LedgerEntryDirection {
+  DEBIT
+  CREDIT
+}
+
 model User {
-  id           String   @id @default(uuid()) @db.Uuid
-  name         String
-  email        String   @unique
-  passwordHash String   @map("password_hash")
-  createdAt    DateTime @default(now()) @map("created_at")
-  updatedAt    DateTime @updatedAt @map("updated_at")
-  wallet       Wallet?
+  id                    String               @id @default(uuid()) @db.Uuid
+  name                  String
+  email                 String               @unique
+  passwordHash          String               @map("password_hash")
+  createdAt             DateTime             @default(now()) @map("created_at")
+  updatedAt             DateTime             @updatedAt @map("updated_at")
+  wallet                Wallet?
+  financialOperations   FinancialOperation[]
+  idempotencyRecords    IdempotencyRecord[]
 
   @@map("users")
 }
 
 model Wallet {
-  id        String          @id @default(uuid()) @db.Uuid
-  userId    String          @unique @map("user_id") @db.Uuid
-  user      User            @relation(fields: [userId], references: [id], onDelete: Cascade)
-  balances  WalletBalance[]
-  createdAt DateTime        @default(now()) @map("created_at")
-  updatedAt DateTime        @updatedAt @map("updated_at")
+  id                         String               @id @default(uuid()) @db.Uuid
+  userId                     String               @unique @map("user_id") @db.Uuid
+  user                       User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  balances                   WalletBalance[]
+  primaryFinancialOperations FinancialOperation[] @relation("PrimaryWalletOperations")
+  ledgerEntries              LedgerEntry[]
+  createdAt                  DateTime             @default(now()) @map("created_at")
+  updatedAt                  DateTime             @updatedAt @map("updated_at")
 
   @@map("wallets")
 }
@@ -49,4 +70,66 @@ model WalletBalance {
   @@unique([walletId, currency])
   @@index([walletId, currency])
   @@map("wallet_balances")
+}
+
+model FinancialOperation {
+  id                    String                   @id @default(uuid()) @db.Uuid
+  actorUserId           String                   @map("actor_user_id") @db.Uuid
+  actorUser             User                     @relation(fields: [actorUserId], references: [id], onDelete: Restrict)
+  primaryWalletId       String                   @map("primary_wallet_id") @db.Uuid
+  primaryWallet         Wallet                   @relation("PrimaryWalletOperations", fields: [primaryWalletId], references: [id], onDelete: Restrict)
+  idempotencyRecordId   String?                  @unique @map("idempotency_record_id") @db.Uuid
+  idempotencyRecord     IdempotencyRecord?       @relation(fields: [idempotencyRecordId], references: [id], onDelete: SetNull)
+  originalOperationId   String?                  @unique @map("original_operation_id") @db.Uuid
+  originalOperation     FinancialOperation?      @relation("OriginalOperation", fields: [originalOperationId], references: [id], onDelete: SetNull)
+  reversalOperations    FinancialOperation[]     @relation("OriginalOperation")
+  reversalOperationId   String?                  @unique @map("reversal_operation_id") @db.Uuid
+  reversalOperation     FinancialOperation?      @relation("ReversalOperation", fields: [reversalOperationId], references: [id], onDelete: SetNull)
+  reversedOperation     FinancialOperation?      @relation("ReversalOperation")
+  correlationId         String?                  @map("correlation_id") @db.Uuid
+  type                  FinancialOperationType
+  status                FinancialOperationStatus @default(COMPLETED)
+  entries               LedgerEntry[]
+  createdAt             DateTime                 @default(now()) @map("created_at")
+  updatedAt             DateTime                 @updatedAt @map("updated_at")
+
+  @@index([actorUserId, createdAt])
+  @@index([primaryWalletId, createdAt])
+  @@index([type, status])
+  @@index([correlationId])
+  @@map("financial_operations")
+}
+
+model LedgerEntry {
+  id                String               @id @default(uuid()) @db.Uuid
+  operationId       String               @map("operation_id") @db.Uuid
+  operation         FinancialOperation   @relation(fields: [operationId], references: [id], onDelete: Restrict)
+  walletId          String               @map("wallet_id") @db.Uuid
+  wallet            Wallet               @relation(fields: [walletId], references: [id], onDelete: Restrict)
+  currency          Currency
+  direction         LedgerEntryDirection
+  amountMinor       BigInt               @map("amount_minor")
+  balanceAfterMinor BigInt               @map("balance_after_minor")
+  createdAt         DateTime             @default(now()) @map("created_at")
+
+  @@index([operationId])
+  @@index([walletId, currency, createdAt])
+  @@map("ledger_entries")
+}
+
+model IdempotencyRecord {
+  id                 String               @id @default(uuid()) @db.Uuid
+  userId             String               @map("user_id") @db.Uuid
+  user               User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  endpoint           String
+  key                String               @map("idempotency_key")
+  payloadHash        String               @map("payload_hash")
+  storedResponse     Json?                @map("stored_response")
+  operation          FinancialOperation?
+  createdAt          DateTime             @default(now()) @map("created_at")
+  updatedAt          DateTime             @updatedAt @map("updated_at")
+
+  @@unique([userId, endpoint, key], name: "idempotency_records_user_id_endpoint_key_key")
+  @@index([userId, endpoint])
+  @@map("idempotency_records")
 }
