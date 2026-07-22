@@ -1,5 +1,6 @@
 runConfig:
   minInstances: 0
+  memoryMiB: 1024
 
 scripts:
   buildCommand: npm run build:apphosting
