@@ -21,7 +21,7 @@
   ],
   "apphosting": {
     "backendId": "global-wallet",
-    "rootDir": "apps/web",
+    "rootDir": ".",
     "ignore": [
       "node_modules",
       ".git",

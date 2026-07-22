@@ -4,3 +4,4 @@ export const quoteNotFoundError = () => new AppError({ code: 'QUOTE_NOT_FOUND', 
 export const quoteExpiredError = () => new AppError({ code: 'QUOTE_EXPIRED', message: 'Quote expired', statusCode: 409 });
 export const quoteAlreadyUsedError = () => new AppError({ code: 'QUOTE_ALREADY_USED', message: 'Quote already used', statusCode: 409 });
 export const unsupportedCurrencyPairError = () => new AppError({ code: 'UNSUPPORTED_CURRENCY', message: 'Source and target currencies must be different', statusCode: 400 });
+export const externalExchangeRateServiceFailureError = () => new AppError({ code: 'EXTERNAL_SERVICE_FAILURE', message: 'Exchange rate service is unavailable', statusCode: 502 });

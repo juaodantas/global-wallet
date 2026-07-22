@@ -10,7 +10,7 @@ import { getWallet, type WalletApiResult } from '../../lib/api/wallet-api';
 import { WalletActionsNav } from './wallet-actions-nav';
 import { WalletBalanceCard } from './wallet-balance-card';
 import { WalletRecentActivityPlaceholder } from './wallet-recent-activity-placeholder';
-import { WalletReferenceTotalPlaceholder } from './wallet-reference-total-placeholder';
+import { WalletReferenceRatesCard } from './wallet-reference-rates-card';
 
 type WalletState = { status: 'loading' } | WalletApiResult;
 type WalletDashboardProps = { renderLayout?: (children: ReactNode, authenticated: boolean) => ReactNode };
@@ -73,7 +73,7 @@ function WalletContent({ wallet }: { wallet: WalletDto }) {
         <StateView variant="empty" title="Ainda não há saldo" description="Sua carteira está vazia. Faça um depósito para começar a movimentar." />
       ) : null}
       <section className="wallet-dashboard__planned" aria-label="Áreas planejadas da carteira">
-        <WalletReferenceTotalPlaceholder />
+        <WalletReferenceRatesCard />
         <WalletActionsNav />
       </section>
       <section className="wallet-dashboard__grid" aria-label="Saldos por moeda">
