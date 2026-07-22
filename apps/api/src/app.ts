@@ -72,7 +72,11 @@ export async function buildApp(dependencies: AppDependencies = {}) {
 
   app.get('/health', async () => {
     await prisma.$queryRaw`SELECT 1`;
-    return { status: 'ok', database: 'ok' };
+    const userCount = await prisma.user.count();
+    await prisma.$transaction(async (transaction) => {
+      await transaction.user.count();
+    });
+    return { status: 'ok', database: 'ok', userCount, transaction: 'ok' };
   });
   await registerAuthRoutes(app, { authService, env });
   await registerWalletRoutes(app, { walletQuery, env });
