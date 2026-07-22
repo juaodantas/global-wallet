@@ -1,40 +1,19 @@
-'use client';
-
-import { useEffect, useState } from 'react';
 import type { BrlExchangeRatesDto } from '@global-wallet/contracts';
 import { Badge } from '../../components/ui/badge';
 import { Card } from '../../components/ui/card';
-import { getBrlExchangeRates } from '../../lib/api/exchange-api';
+import type { BrlExchangeRatesState } from './use-brl-exchange-rates';
 
-type RatesState = { status: 'loading' } | { status: 'success'; data: BrlExchangeRatesDto } | { status: 'error' };
-
-export function WalletReferenceRatesCard() {
-  const [state, setState] = useState<RatesState>({ status: 'loading' });
-
-  useEffect(() => {
-    let active = true;
-    getBrlExchangeRates()
-      .then((data) => {
-        if (active) setState({ status: 'success', data });
-      })
-      .catch(() => {
-        if (active) setState({ status: 'error' });
-      });
-    return () => {
-      active = false;
-    };
-  }, []);
-
+export function WalletReferenceRatesCard({ ratesState }: { ratesState: BrlExchangeRatesState }) {
   return (
-    <Card className="wallet-reference-total" aria-labelledby="wallet-reference-rates-title">
+    <Card className="wallet-reference-rates-card" aria-labelledby="wallet-reference-rates-title">
       <div className="wallet-placeholder__header">
         <Badge variant="status">Informativo</Badge>
-        <span>Saldos separados por moeda</span>
+        <span>Referência de leitura</span>
       </div>
       <h2 id="wallet-reference-rates-title">Cotações atuais em BRL</h2>
-      {state.status === 'loading' ? <p>Carregando cotações de referência...</p> : null}
-      {state.status === 'error' ? <p>Cotações indisponíveis no momento. Seus saldos reais continuam separados por moeda.</p> : null}
-      {state.status === 'success' ? <RatesContent data={state.data} /> : null}
+      {ratesState.status === 'loading' ? <p className="wallet-reference-rates__meta">Carregando cotações de referência...</p> : null}
+      {ratesState.status === 'error' ? <p className="wallet-reference-rates__meta">Cotações indisponíveis. Saldos reais continuam separados.</p> : null}
+      {ratesState.status === 'success' ? <RatesContent data={ratesState.data} /> : null}
     </Card>
   );
 }
@@ -47,12 +26,13 @@ function RatesContent({ data }: { data: BrlExchangeRatesDto }) {
     <>
       <div className="wallet-reference-rates" aria-label="Cotações atuais contra BRL">
         {data.rates.map((rate) => (
-          <p key={rate.sourceCurrency}>
-            1 {rate.sourceCurrency} = {formatBrl(rate.rate)}
-          </p>
+          <div key={rate.sourceCurrency} className="wallet-reference-rates__row">
+            <span>1 {rate.sourceCurrency}</span>
+            <strong>{formatBrl(rate.rate)}</strong>
+          </div>
         ))}
       </div>
-      <p>Fonte: {formatProvider(provider)} · Atualizado em {latestFetchedAt.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</p>
+      <p className="wallet-reference-rates__meta">Fonte: {formatProvider(provider)} · Atualizado em {latestFetchedAt.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</p>
     </>
   );
 }

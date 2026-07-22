@@ -44,9 +44,9 @@ export function WalletRecentActivityPlaceholder() {
     <Card className="wallet-recent-activity" aria-labelledby="wallet-recent-activity-title">
       <h2 id="wallet-recent-activity-title">Atividade recente</h2>
       {loading ? (
-        <p style={{ color: 'var(--color-muted)', margin: 0 }}>Carregando...</p>
+        <p className="wallet-recent-activity__empty">Carregando...</p>
       ) : items.length === 0 ? (
-        <p style={{ color: 'var(--color-muted)', margin: 0 }}>
+        <p className="wallet-recent-activity__empty">
           Nenhuma movimentação encontrada.
         </p>
       ) : (
