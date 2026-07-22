@@ -1,6 +1,5 @@
 import { authSessionSchema, type AuthSessionDto } from '@global-wallet/contracts';
-
-const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:3001';
+import { apiBaseUrl } from './api-base-url';
 
 export async function register(input: { name: string; email: string; password: string }): Promise<AuthSessionDto> {
   return postAuth('/auth/register', input);

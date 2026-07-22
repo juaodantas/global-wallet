@@ -1,7 +1,6 @@
 import { depositListSchema, depositSchema, type DepositDto } from '@global-wallet/contracts';
+import { apiBaseUrl } from './api-base-url';
 import { createIdempotencyKey, readApiError } from './api-error';
-
-const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:3001';
 
 export async function createDeposit(amountMinor: number): Promise<DepositDto> {
   const response = await fetch(`${apiBaseUrl}/deposits`, { method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json', 'Idempotency-Key': createIdempotencyKey() }, body: JSON.stringify({ amountMinor }) });

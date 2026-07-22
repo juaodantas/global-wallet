@@ -1,7 +1,6 @@
 import { reversalResponseSchema, type ReversalDto } from '@global-wallet/contracts';
+import { apiBaseUrl } from './api-base-url';
 import { createIdempotencyKey, readApiError } from './api-error';
-
-const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:3001';
 
 export async function reversalOperation(operationId: string, reason?: string): Promise<ReversalDto> {
   const response = await fetch(`${apiBaseUrl}/financial-operations/${operationId}/reversal`, {

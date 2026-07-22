@@ -1,7 +1,6 @@
 import { transferListSchema, transferSchema, type Currency, type TransferDto } from '@global-wallet/contracts';
+import { apiBaseUrl } from './api-base-url';
 import { createIdempotencyKey, readApiError } from './api-error';
-
-const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:3001';
 
 export async function createTransfer(input: { recipientEmail: string; currency: Currency; amountMinor: number }): Promise<TransferDto> {
   const response = await fetch(`${apiBaseUrl}/transfers`, { method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json', 'Idempotency-Key': createIdempotencyKey() }, body: JSON.stringify(input) });

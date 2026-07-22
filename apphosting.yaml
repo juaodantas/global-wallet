@@ -7,6 +7,11 @@ scripts:
   runCommand: npm run start:apphosting
 
 env:
+  - variable: API_BASE_URL
+    value: https://us-central1-global-wallet-ad32b.cloudfunctions.net/api
+    availability:
+      - BUILD
+      - RUNTIME
   - variable: NEXT_PUBLIC_API_BASE_URL
     value: https://us-central1-global-wallet-ad32b.cloudfunctions.net/api
     availability:

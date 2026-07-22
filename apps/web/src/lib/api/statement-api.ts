@@ -1,7 +1,6 @@
 import { statementListSchema, statementDetailSchema, type StatementListDto, type StatementDetailDto, type Currency } from '@global-wallet/contracts';
+import { apiBaseUrl } from './api-base-url';
 import { readApiError } from './api-error';
-
-const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:3001';
 
 export async function listStatement(params?: { cursor?: string; currency?: Currency; type?: string; from?: string; to?: string }): Promise<StatementListDto> {
   const searchParams = new URLSearchParams();
