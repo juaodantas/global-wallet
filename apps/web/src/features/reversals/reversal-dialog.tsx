@@ -5,7 +5,7 @@ import type { ReversalDto } from '@global-wallet/contracts';
 import { Button } from '../../components/ui/button';
 import { Card } from '../../components/ui/card';
 import { Field } from '../../components/ui/field';
-import { reversalOperation } from '../../lib/api/reversal-api';
+import { reverseOperationAction } from '../../lib/actions/reversal-actions';
 
 type ReversalDialogProps = {
   operationId: string;
@@ -30,7 +30,7 @@ export function ReversalDialog({ operationId, operationType, onSuccess, onError 
     setLoading(true);
     setError(null);
     try {
-      const result = await reversalOperation(operationId, reason || undefined);
+      const result = await reverseOperationAction(operationId, reason || undefined);
       onSuccess(result);
       setShowConfirm(false);
     } catch (err) {

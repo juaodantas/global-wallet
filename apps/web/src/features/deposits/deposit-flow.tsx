@@ -7,7 +7,8 @@ import { Card } from '../../components/ui/card';
 import { Field } from '../../components/ui/field';
 import { PageHeader } from '../../components/ui/page-header';
 import { formatMoneyMinor } from '../../lib/format/money';
-import { confirmDeposit, createDeposit, listDeposits } from '../../lib/api/deposit-api';
+import { createDepositAction, confirmDepositAction } from '../../lib/actions/deposit-actions';
+import { listDeposits } from '../../lib/api/deposit-api';
 
 export function DepositFlow() {
   const [amount, setAmount] = useState('');
@@ -25,7 +26,7 @@ export function DepositFlow() {
     setLoading(true);
     setMessage(undefined);
     try {
-      await createDeposit(Math.round(Number(amount) * 100));
+      await createDepositAction(Math.round(Number(amount) * 100));
       setAmount('');
       await refresh();
     } catch (error) {
@@ -39,7 +40,7 @@ export function DepositFlow() {
     setLoading(true);
     setMessage(undefined);
     try {
-      await confirmDeposit(depositId);
+      await confirmDepositAction(depositId);
       await refresh();
     } catch (error) {
       setMessage(error instanceof Error ? error.message : 'Erro inesperado.');

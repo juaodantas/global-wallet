@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { login, register } from '../../lib/api/auth-api';
+import { loginAction, registerAction } from '../../lib/actions/auth-actions';
 import { Button } from '../../components/ui/button';
 import { Field } from '../../components/ui/field';
 
@@ -29,9 +29,9 @@ export function AuthForm({ mode, submitLabel }: AuthFormProps) {
     setLoading(true);
     try {
       if (mode === 'register') {
-        await register({ name, email, password });
+        await registerAction({ name, email, password });
       } else {
-        await login({ email, password });
+        await loginAction({ email, password });
       }
       router.push('/');
     } catch (submitError) {

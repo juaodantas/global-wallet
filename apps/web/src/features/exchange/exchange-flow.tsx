@@ -7,7 +7,7 @@ import { Card } from '../../components/ui/card';
 import { Field } from '../../components/ui/field';
 import { PageHeader } from '../../components/ui/page-header';
 import { formatMoneyMinor } from '../../lib/format/money';
-import { createExchangeQuote, executeExchangeConversion } from '../../lib/api/exchange-api';
+import { createQuoteAction, executeConversionAction } from '../../lib/actions/exchange-actions';
 
 const currencies: Currency[] = ['BRL', 'USD', 'EUR', 'GBP'];
 
@@ -24,7 +24,7 @@ export function ExchangeFlow() {
     setLoading(true);
     setMessage(undefined);
     try {
-      setQuote(await createExchangeQuote({
+      setQuote(await createQuoteAction({
         sourceCurrency,
         targetCurrency,
         sourceAmountMinor: Math.round(Number(amount) * 100)
@@ -41,7 +41,7 @@ export function ExchangeFlow() {
     setLoading(true);
     setMessage(undefined);
     try {
-      setConversion(await executeExchangeConversion(quote.quoteId));
+      setConversion(await executeConversionAction(quote.quoteId));
     } catch (error) {
       setMessage(error instanceof Error ? error.message : 'Erro inesperado.');
     } finally {
