@@ -7,19 +7,27 @@ export async function apiPost<T>(path: string, body?: Record<string, unknown>): 
   const sessionCookie = cookieStore.get('gw_session');
 
   const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
     'Idempotency-Key': globalThis.crypto.randomUUID(),
   };
+
+  if (body !== undefined) {
+    headers['Content-Type'] = 'application/json';
+  }
 
   if (sessionCookie) {
     headers['Cookie'] = `gw_session=${sessionCookie.value}`;
   }
 
-  const response = await fetch(`${apiBaseUrl}${path}`, {
+  const requestInit: RequestInit = {
     method: 'POST',
     headers,
-    body: body !== undefined ? JSON.stringify(body) : null,
-  });
+  };
+
+  if (body !== undefined) {
+    requestInit.body = JSON.stringify(body);
+  }
+
+  const response = await fetch(`${apiBaseUrl}${path}`, requestInit);
 
   if (!response.ok) {
     const payload = await response.json().catch(() => null);
