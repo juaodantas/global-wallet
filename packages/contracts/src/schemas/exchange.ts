@@ -42,3 +42,32 @@ export const exchangeConversionSchema = z.object({
   provider: z.string().min(1),
   createdAt: z.string()
 });
+
+export const brlReferenceSourceCurrencySchema = z.enum(['USD', 'EUR', 'GBP']);
+
+export const brlExchangeRateSchema = z.object({
+  sourceCurrency: brlReferenceSourceCurrencySchema,
+  targetCurrency: z.literal('BRL'),
+  unitAmount: z.literal(1),
+  rate: exchangeRateStringSchema,
+  provider: z.literal('frankfurter'),
+  fetchedAt: z.string()
+});
+
+const requiredBrlReferenceSourceCurrencies = brlReferenceSourceCurrencySchema.options;
+
+export const brlExchangeRatesSchema = z.object({
+  baseCurrency: z.literal('BRL'),
+  rates: z.array(brlExchangeRateSchema).length(3).superRefine((rates, context) => {
+    for (const sourceCurrency of requiredBrlReferenceSourceCurrencies) {
+      const occurrences = rates.filter((rate) => rate.sourceCurrency === sourceCurrency).length;
+      if (occurrences !== 1) {
+        context.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `Expected exactly one ${sourceCurrency}/BRL rate`,
+          path: ['rates']
+        });
+      }
+    }
+  })
+});

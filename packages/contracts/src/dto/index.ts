@@ -3,7 +3,7 @@ import type { authSessionSchema, authUserSchema, currencySchema, errorResponseSc
 import type { loginRequestSchema, registerRequestSchema } from '../schemas/auth.js';
 import type { createDepositRequestSchema, depositSchema } from '../schemas/deposits.js';
 import type { createTransferRequestSchema, financialOperationSchema, transferSchema } from '../schemas/transfers.js';
-import type { createExchangeConversionRequestSchema, createExchangeQuoteRequestSchema, exchangeConversionSchema, exchangeQuoteSchema } from '../schemas/exchange.js';
+import type { brlExchangeRateSchema, brlExchangeRatesSchema, createExchangeConversionRequestSchema, createExchangeQuoteRequestSchema, exchangeConversionSchema, exchangeQuoteSchema } from '../schemas/exchange.js';
 import type { statementDetailSchema, statementItemSchema, statementListSchema, statementQuerySchema } from '../schemas/statement.js';
 import type { reversalRequestSchema, reversalResponseSchema } from '../schemas/reversals.js';
 
@@ -24,6 +24,8 @@ export type CreateExchangeQuoteRequestDto = z.input<typeof createExchangeQuoteRe
 export type CreateExchangeConversionRequestDto = z.input<typeof createExchangeConversionRequestSchema>;
 export type ExchangeQuoteDto = z.infer<typeof exchangeQuoteSchema>;
 export type ExchangeConversionDto = z.infer<typeof exchangeConversionSchema>;
+export type BrlExchangeRateDto = z.infer<typeof brlExchangeRateSchema>;
+export type BrlExchangeRatesDto = z.infer<typeof brlExchangeRatesSchema>;
 export type StatementItemDto = z.infer<typeof statementItemSchema>;
 export type StatementListDto = z.infer<typeof statementListSchema>;
 export type StatementDetailDto = z.infer<typeof statementDetailSchema>;

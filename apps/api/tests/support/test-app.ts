@@ -6,6 +6,7 @@ import { buildApp } from '../../src/app.js';
 import type { AuthUser, PublicAuthUser, UserId } from '../../src/modules/auth/domain/types.js';
 import type { CreateWalletForUserPort } from '../../src/modules/wallet/application/create-wallet-port.js';
 import type { WalletReadRepository } from '../../src/modules/wallet/application/get-wallet-for-user.js';
+import type { ExchangeRateProvider } from '../../src/modules/exchange/application/exchange-rate-provider.js';
 import { toUserId } from '../../src/shared/domain/ids.js';
 import { AppError } from '../../src/shared/errors/app-error.js';
 
@@ -14,7 +15,12 @@ export const testEnv = {
   PORT: 3001,
   DATABASE_URL: 'postgresql://postgres:postgres@localhost:5432/global_wallet?schema=public',
   JWT_SECRET: 'test-secret-with-more-than-thirty-two-characters',
-  WEB_ORIGIN: 'http://localhost:3000'
+  WEB_ORIGIN: 'http://localhost:3000',
+  FRANKFURTER_BASE_URL: 'https://api.frankfurter.app',
+  FRANKFURTER_TIMEOUT_MS: 3000,
+  FRANKFURTER_CACHE_TTL_MS: 300000,
+  FRANKFURTER_RATE_LIMIT_WINDOW_MS: 60000,
+  FRANKFURTER_RATE_LIMIT_MAX_REQUESTS: 60
 };
 
 function testUserId(sequence: number): UserId {
@@ -92,9 +98,15 @@ export class FakeWalletStore implements CreateWalletForUserPort, WalletReadRepos
   }
 }
 
-export async function createTestApp() {
+export async function createTestApp(options: { exchangeRateProvider?: ExchangeRateProvider } = {}) {
   const authRepository = new FakeAuthRepository();
   const walletCreator = new FakeWalletStore();
-  const app = await buildApp({ env: testEnv, authRepository, walletCreator, walletRepository: walletCreator });
+  const app = await buildApp({
+    env: testEnv,
+    authRepository,
+    walletCreator,
+    walletRepository: walletCreator,
+    ...(options.exchangeRateProvider ? { exchangeRateProvider: options.exchangeRateProvider } : {})
+  });
   return { app, walletCreator };
 }

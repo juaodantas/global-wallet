@@ -12,6 +12,8 @@
     "dev:local": "scripts/dev-local.sh",
     "dev:web": "npm run dev -w @global-wallet/web",
     "build": "npm run build --workspaces --if-present",
+    "build:apphosting": "npm run build -w @global-wallet/contracts && npm run build -w @global-wallet/web",
+    "start:apphosting": "npm run start -w @global-wallet/web",
     "typecheck": "npm run build -w @global-wallet/contracts && npm run typecheck --workspaces --if-present",
     "test": "npm run test --workspaces --if-present",
     "lint": "npm run typecheck",

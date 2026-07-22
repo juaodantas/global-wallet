@@ -24,8 +24,10 @@ import { TransferService } from './modules/transfers/application/transfer-servic
 import { PrismaTransferRepository } from './modules/transfers/infrastructure/prisma-transfer-repository.js';
 import { registerTransferRoutes } from './modules/transfers/http/transfer-routes.js';
 import { ExchangeService } from './modules/exchange/application/exchange-service.js';
+import type { ExchangeRateProvider } from './modules/exchange/application/exchange-rate-provider.js';
+import { ReferenceRatesService } from './modules/exchange/application/reference-rates-service.js';
 import { PrismaExchangeRepository } from './modules/exchange/infrastructure/prisma-exchange-repository.js';
-import { StaticExchangeRateProvider } from './modules/exchange/infrastructure/static-rate-provider.js';
+import { FrankfurterExchangeRateProvider } from './modules/exchange/infrastructure/frankfurter-rate-provider.js';
 import { registerExchangeRoutes } from './modules/exchange/http/exchange-routes.js';
 import { StatementService } from './modules/statement/application/statement-service.js';
 import { registerStatementRoutes } from './modules/statement/http/statement-routes.js';
@@ -37,6 +39,7 @@ export type AppDependencies = {
   authRepository?: AuthRepository;
   walletCreator?: CreateWalletForUserPort;
   walletRepository?: WalletReadRepository;
+  exchangeRateProvider?: ExchangeRateProvider;
 };
 
 export async function buildApp(dependencies: AppDependencies = {}) {
@@ -55,7 +58,15 @@ export async function buildApp(dependencies: AppDependencies = {}) {
   const ledgerPosting = new LedgerPostingService(new PrismaLedgerRepository(prisma));
   const depositService = new DepositService(new PrismaDepositRepository(prisma), ledgerPosting);
   const transferService = new TransferService(new PrismaTransferRepository(prisma), ledgerPosting);
-  const exchangeService = new ExchangeService(new PrismaExchangeRepository(prisma), ledgerPosting, new StaticExchangeRateProvider());
+  const exchangeRateProvider = dependencies.exchangeRateProvider ?? new FrankfurterExchangeRateProvider({
+    baseUrl: env.FRANKFURTER_BASE_URL,
+    timeoutMs: env.FRANKFURTER_TIMEOUT_MS,
+    cacheTtlMs: env.FRANKFURTER_CACHE_TTL_MS,
+    rateLimitWindowMs: env.FRANKFURTER_RATE_LIMIT_WINDOW_MS,
+    rateLimitMaxRequests: env.FRANKFURTER_RATE_LIMIT_MAX_REQUESTS
+  });
+  const exchangeService = new ExchangeService(new PrismaExchangeRepository(prisma), ledgerPosting, exchangeRateProvider);
+  const referenceRatesService = new ReferenceRatesService(exchangeRateProvider);
   const statementService = new StatementService(prisma);
   const reversalService = new ReversalService(prisma, ledgerPosting);
 
@@ -64,7 +75,7 @@ export async function buildApp(dependencies: AppDependencies = {}) {
   await registerWalletRoutes(app, { walletQuery, env });
   await registerDepositRoutes(app, { depositService, env });
   await registerTransferRoutes(app, { transferService, env });
-  await registerExchangeRoutes(app, { exchangeService, env });
+  await registerExchangeRoutes(app, { exchangeService, referenceRatesService, env });
   await registerStatementRoutes(app, { statementService, env });
   await registerReversalRoutes(app, { reversalService, env });
 
