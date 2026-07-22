@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { logout } from '../../lib/api/auth-api';
+import { logoutAction } from '../../lib/actions/auth-actions';
 import { Button } from '../../components/ui/button';
 
 export function LogoutButton() {
@@ -14,7 +14,7 @@ export function LogoutButton() {
     setLoading(true);
     setMessage(null);
     try {
-      await logout();
+      await logoutAction();
       setMessage('Sessão encerrada.');
       router.replace('/login');
       router.refresh();

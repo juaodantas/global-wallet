@@ -7,7 +7,8 @@ import { Card } from '../../components/ui/card';
 import { Field } from '../../components/ui/field';
 import { PageHeader } from '../../components/ui/page-header';
 import { formatMoneyMinor } from '../../lib/format/money';
-import { createTransfer, listTransfers } from '../../lib/api/transfer-api';
+import { createTransferAction } from '../../lib/actions/transfer-actions';
+import { listTransfers } from '../../lib/api/transfer-api';
 
 const currencies: Currency[] = ['BRL', 'USD', 'EUR', 'GBP'];
 
@@ -23,7 +24,7 @@ export function TransferFlow() {
   async function refresh() { setTransfers(await listTransfers()); }
   async function submit() {
     setLoading(true); setMessage(undefined);
-    try { await createTransfer({ recipientEmail, currency, amountMinor: Math.round(Number(amount) * 100) }); setAmount(''); await refresh(); }
+    try { await createTransferAction({ recipientEmail, currency, amountMinor: Math.round(Number(amount) * 100) }); setAmount(''); await refresh(); }
     catch (error) { setMessage(error instanceof Error ? error.message : 'Erro inesperado.'); }
     finally { setLoading(false); }
   }

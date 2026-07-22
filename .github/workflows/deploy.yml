@@ -172,7 +172,7 @@ jobs:
         run: npm --prefix functions run build
 
       - name: Deploy Firebase Functions
-        run: npx --yes firebase-tools deploy --project "${{ secrets.FIREBASE_PROJECT_ID }}" --only functions
+        run: npx --yes firebase-tools deploy --project "${{ secrets.FIREBASE_PROJECT_ID }}" --only functions --force
 
       - name: Deploy Firebase App Hosting
         run: npx --yes firebase-tools deploy --project "${{ secrets.FIREBASE_PROJECT_ID }}" --only apphosting
