@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Global Wallet">
+  <rect width="64" height="64" rx="16" fill="#f3f6fb"/>
+  <circle cx="32" cy="32" r="21" fill="#173a8a"/>
+  <path d="M12 32h40" fill="none" stroke="#ffffff" stroke-width="4" stroke-linecap="round"/>
+  <path d="M32 11c6 6 9 13 9 21s-3 15-9 21M32 11c-6 6-9 13-9 21s3 15 9 21" fill="none" stroke="#eaf0ff" stroke-width="4" stroke-linecap="round"/>
+  <circle cx="32" cy="32" r="21" fill="none" stroke="#102d6e" stroke-width="3"/>
+</svg>
