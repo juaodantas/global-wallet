@@ -70,7 +70,14 @@ export async function buildApp(dependencies: AppDependencies = {}) {
   const statementService = new StatementService(prisma);
   const reversalService = new ReversalService(prisma, ledgerPosting);
 
-  app.get('/health', async () => ({ status: 'ok' }));
+  app.get('/health', async () => {
+    await prisma.$queryRaw`SELECT 1`;
+    const userCount = await prisma.user.count();
+    await prisma.$transaction(async (transaction) => {
+      await transaction.user.count();
+    });
+    return { status: 'ok', database: 'ok', userCount, transaction: 'ok' };
+  });
   await registerAuthRoutes(app, { authService, env });
   await registerWalletRoutes(app, { walletQuery, env });
   await registerDepositRoutes(app, { depositService, env });

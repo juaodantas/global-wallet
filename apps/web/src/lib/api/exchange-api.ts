@@ -1,7 +1,6 @@
 import { brlExchangeRatesSchema, exchangeConversionSchema, exchangeQuoteSchema, type BrlExchangeRatesDto, type Currency, type ExchangeConversionDto, type ExchangeQuoteDto } from '@global-wallet/contracts';
+import { apiBaseUrl } from './api-base-url';
 import { createIdempotencyKey, readApiError } from './api-error';
-
-const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:3001';
 
 export async function createExchangeQuote(input: { sourceCurrency: Currency; targetCurrency: Currency; sourceAmountMinor: number }): Promise<ExchangeQuoteDto> {
   const response = await fetch(`${apiBaseUrl}/exchange/quotes`, { method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(input) });
